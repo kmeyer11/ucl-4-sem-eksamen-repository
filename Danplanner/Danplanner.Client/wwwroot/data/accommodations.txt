@@ -1,0 +1,5 @@
+﻿# Format: title|description|price|imageUrl
+# imageUrl skal være web-sti (fx /images/hytte-a.jpg)
+Almindelig hytte - Max 2 prs.|Mindre hytte ideel til én person eller par, med skøn udsigt og en fredelig placering tæt på naturen.|899|/images/hytte-a.png
+Luksus hytte - Max 4 prs.|Hyggelig hytte med plads til fire, med lille køkkenniche og terrasse, perfekt til afslapning udendørs.|1350|/images/hytte-b.png
+Campingplads - Max 6 prs.|Stor telt- eller vognplads tæt ved servicebygninger og legeplads, oplagt for familier og campister.|350|/images/plads.png

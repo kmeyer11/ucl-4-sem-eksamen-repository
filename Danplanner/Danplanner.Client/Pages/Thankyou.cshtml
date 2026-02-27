@@ -1,0 +1,80 @@
+﻿@page
+@model Danplanner.Client.Pages.ThankyouModel
+@{
+    ViewData["Title"] = "Tak for din booking";
+}
+
+<div class="container">
+    <div class="thankyou-grid">
+        <div class="left-column">
+            <div class="thankyou-box">
+                <h3>Tak for din booking!</h3>
+                <p>
+                    Vi sender en bekræftelse på mail.                                           
+                    Har du spørgsmål, er du meget velkommen til at kontakte os på telefon eller mail.
+                </p>
+                <h5
+                    >Vi glæder os til at se dig!</h5>
+            </div>
+        </div>
+
+        <aside class="contact-box">
+            <h6><span class="badge bg-dark">i</span> Kontakt Information</h6>
+            <p><strong>Tlf:</strong> @Model.ContactInformation.ContactPhoneNumber</p>
+            <p><strong>Email:</strong> @Model.ContactInformation.ContactEmail</p>
+            <p><strong>Adresse:</strong> @Model.ContactInformation.ContactAdress</p>
+        </aside>
+    </div>
+</div>
+
+<style>
+    .thankyou-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    .left-column {
+        flex: 1;
+        min-width: 280px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .thankyou-box {
+        border: none; 
+        background: transparent;
+        padding: 0; 
+        font-size: 1.1rem;
+        line-height: 1.5;
+    }
+
+    .contact-box {
+        border: 1px solid #333;
+        background: #f7f7f7;
+        padding: 12px;
+        border-radius: 4px;
+        margin-left: auto; 
+        min-width: 280px;
+        flex: 0 0 auto;
+        position: sticky;
+        top: 20px;
+    }
+
+    @@media (max-width: 992px) {
+        .thankyou-grid
+
+    {
+        flex-direction: column;
+    }
+
+    .contact-box {
+        position: static;
+        width: 100%;
+        margin-left: 0;
+    }
+
+    }
+</style>

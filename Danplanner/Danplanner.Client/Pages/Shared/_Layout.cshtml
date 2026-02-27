@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Danplanner</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Danplanner.Client.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+</head>
+<body>
+    @{
+        var page = ViewContext.RouteData.Values["page"]?.ToString();
+        bool hideBackButton =
+        string.Equals(page, "/Index", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(page, "/ThankYou", StringComparison.OrdinalIgnoreCase);
+
+        ViewBag.HideBackButton = hideBackButton;
+    }
+
+    <header>
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="container">
+                    <a class="navbar-brand" asp-page="/Index">Danplanner</a>
+
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-page="/Index">Hjem</a>
+                            </li>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/Admin/Admin">Admin</a>
+                                </li>
+                            }
+
+                        </ul>
+
+                        <div class="d-flex align-items-center ms-3">
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <span class="me-3">Hej, @User.Identity.Name</span>
+                                <button id="logoutBtn" class="btn btn-outline-danger">Logout</button>
+                            }
+                            else
+                            {
+                                <input type="email" id="loginIdentifier" class="form-control me-2" placeholder="Email" required />
+                                <button id="loginBtn" class="btn btn-outline-secondary me-2">Login</button>
+                                <button id="registerBtn" class="btn btn-primary me-2">Registrer</button>
+                            }
+
+                            <div id="google_translate_element" class="ms-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    </header>
+
+    <main class="flex-grow-1">
+        <div class="container py-3">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="border-top footer text-muted text-center py-3">
+        <div class="container">
+            &copy; 2025 - Danplanner - <a asp-area="" asp-page="/Privacy">Privatliv</a>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Luk"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3" id="adminPasswordGroup" style="display:none;">
+                            <label for="loginPassword" class="form-label">Admin Password</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Admin Password">
+                        </div>
+                        <div class="mb-3" id="userOtpGroup" style="display:none;">
+                            <label for="loginCode" class="form-label">OTP Code</label>
+                            <input type="text" class="form-control" id="loginCode" placeholder="Indtast tilsendte kode">
+                        </div>
+                        <button type="button" id="loginSubmitBtn" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Registrering</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div id="otpSection">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="otpEmail" class="form-control" value="" required>
+                    </div>
+                    <button id="sendOtpBtn" class="btn btn-primary w-100">Send OTP</button>
+                    <div id="verifyOtpArea" style="display:none;" class="mt-3">
+                        <label class="form-label">Indtast OTP kode</label>
+                        <input type="text" id="otpCode" class="form-control" placeholder="123456">
+                        <button id="verifyOtpBtn" class="btn btn-success w-100 mt-2">Verificer kode</button>
+                    </div>
+                </div>
+
+                <form id="registerForm" style="display:none;">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="registerEmail" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Navn</label>
+                        <input type="text" id="registerUsername" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefon</label>
+                        <input type="tel" id="registerMobile" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Adresse</label>
+                        <input type="text" id="registerAddress" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Opret Bruger</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/da.js"></script>
+    <script src="~/js/login.js" asp-append-version="true"></script>
+    <script src="~/js/register.js" asp-append-version="true"></script>
+
+    <script>
+        flatpickr(".flatpickr-input", { locale: "da", dateFormat: "d-m-Y", minDate: "today" });
+
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'da,en,de,nl',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+    </script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+<style>
+    .calendar-card {
+        min-height: 420px;
+        max-width: 760px;
+        margin: 20px auto;
+    }
+
+    .flatpickr-calendar {
+        width: 100% !important;
+        font-size: 1.05rem;
+    }
+
+    .center-vertical {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    main.flex-grow-1 {
+        flex: 1 0 auto; 
+    }
+
+    footer {
+        flex-shrink: 0; 
+    }
+
+    #google_translate_element {
+        display: inline-block;
+        margin-left: 10px;
+    }
+</style>

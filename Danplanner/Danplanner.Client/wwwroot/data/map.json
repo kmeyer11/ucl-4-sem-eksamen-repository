@@ -1,0 +1,458 @@
+﻿{
+  "ImageUrl": "/images/camping-map.png",
+  "Width": 800,
+  "Height": 400,
+  "Points": [
+    {
+      "Key": "Hytte1",
+      "Title": "Hytte 1",
+      "AccommodationId": 36,
+      "Description": "Plads til 4 personer",
+      "X": 275,
+      "Y": 102,
+      "ImageUrl": "/images/pin-blue.png",
+      "category":  "hytte"
+    },
+    {
+      "Key": "Hytte2",
+      "Title": "Hytte 2",
+      "AccommodationId": 37,
+      "Description": "Par-hytte",
+      "X": 310,
+      "Y": 115,
+      "category": "hytte"
+    },
+    {
+      "Key": "Hytte3",
+      "Title": "Hytte 3",
+      "AccommodationId": 38,
+      "Description": "Par-hytte",
+      "X": 343,
+      "Y": 133,
+      "category": "hytte"
+    },
+    {
+      "Key": "Hytte4",
+      "Title": "Hytte 4",
+      "AccommodationId": 39,
+      "Description": "Par-hytte",
+      "X": 375,
+      "Y": 150,
+      "category": "hytte"
+    },
+    {
+      "Key": "Hytte5",
+      "Title": "Hytte 5",
+      "AccommodationId": 40,
+      "Description": "Par-hytte",
+      "X": 412,
+      "Y": 167,
+      "category": "hytte"
+    },
+    {
+      "Key": "Hytte6",
+      "Title": "Hytte 6",
+      "AccommodationId": 41,
+      "Description": "Par-hytte",
+      "X": 557,
+      "Y": 167,
+      "category": "hytte"
+    },
+    {
+      "Key": "Hytte7",
+      "Title": "Hytte 7",
+      "AccommodationId": 42,
+      "Description": "Par-hytte",
+      "X": 596,
+      "Y": 144,
+      "category": "hytte"
+    },
+    {
+      "Key": "Hytte8",
+      "Title": "Hytte 8",
+      "AccommodationId": 43,
+      "Description": "Par-hytte",
+      "X": 635,
+      "Y": 125,
+      "category": "hytte"
+    },
+    {
+      "Key": "Hytte9",
+      "Title": "Hytte 9",
+      "AccommodationId": 44,
+      "Description": "Par-hytte",
+      "X": 652,
+      "Y": 157,
+      "category": "hytte"
+    },
+    {
+      "Key": "Hytte10",
+      "Title": "Hytte 10",
+      "AccommodationId": 45,
+      "Description": "Par-hytte",
+      "X": 613,
+      "Y": 180,
+      "category": "hytte"
+    },
+    {
+      "Key": "Luksushytte1",
+      "Title": "Luksushytte 1",
+      "AccommodationId": 46,
+      "Description": "Par-hytte",
+      "X": 105,
+      "Y": 137,
+      "category": "luksushytte"
+    },
+    {
+      "Key": "Luksushytte2",
+      "Title": "Luksushytte 2",
+      "AccommodationId": 47,
+      "Description": "Par-hytte",
+      "X": 130,
+      "Y": 125,
+      "category": "luksushytte"
+    },
+    {
+      "Key": "Luksushytte3",
+      "Title": "Luksushytte 3",
+      "AccommodationId": 48,
+      "Description": "Par-hytte",
+      "X": 155,
+      "Y": 110,
+      "category": "luksushytte"
+    },
+    {
+      "Key": "Luksushytte4",
+      "Title": "Luksushytte 4",
+      "AccommodationId": 49,
+      "Description": "Par-hytte",
+      "X": 180,
+      "Y": 97,
+      "category": "luksushytte"
+    },
+    {
+      "Key": "Luksushytte5",
+      "Title": "Luksushytte 5",
+      "AccommodationId": 50,
+      "Description": "Par-hytte",
+      "X": 205,
+      "Y": 85,
+      "category": "luksushytte"
+    },
+    {
+      "Key": "Plads1",
+      "Title": "Plads 1",
+      "AccommodationId": 1,
+      "Description": "Stor Campingplads",
+      "X": 240,
+      "Y": 135,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads2",
+      "Title": "Plads 2",
+      "AccommodationId": 2,
+      "Description": "Stor Campingplads",
+      "X": 270,
+      "Y": 150,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads3",
+      "Title": "Plads 3",
+      "AccommodationId": 3,
+      "Description": "Stor Campingplads",
+      "X": 300,
+      "Y": 165,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads4",
+      "Title": "Plads 4",
+      "AccommodationId": 4,
+      "Description": "Stor Campingplads",
+      "X": 330,
+      "Y": 182,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads5",
+      "Title": "Plads 5",
+      "AccommodationId": 5,
+      "Description": "Stor Campingplads",
+      "X": 355,
+      "Y": 197,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads6",
+      "Title": "Plads 6",
+      "AccommodationId": 6,
+      "Description": "Stor Campingplads",
+      "X": 200,
+      "Y": 155,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads7",
+      "Title": "Plads 7",
+      "AccommodationId": 7,
+      "Description": "Stor Campingplads",
+      "X": 230,
+      "Y": 170,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads8",
+      "Title": "Plads 8",
+      "AccommodationId": 8,
+      "Description": "Stor Campingplads",
+      "X": 260,
+      "Y": 187,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads9",
+      "Title": "Plads 9",
+      "AccommodationId": 9,
+      "Description": "Stor Campingplads",
+      "X": 289,
+      "Y": 202,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads10",
+      "Title": "Plads 10",
+      "AccommodationId": 10,
+      "Description": "Stor Campingplads",
+      "X": 319,
+      "Y": 216,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads11",
+      "Title": "Plads 11",
+      "AccommodationId": 11,
+      "Description": "Stor Campingplads",
+      "X": 165,
+      "Y": 174,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads12",
+      "Title": "Plads 12",
+      "AccommodationId": 12,
+      "Description": "Stor Campingplads",
+      "X": 195,
+      "Y": 190,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads13",
+      "Title": "Plads 13",
+      "AccommodationId": 13,
+      "Description": "Stor Campingplads",
+      "X": 225,
+      "Y": 205,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads14",
+      "Title": "Plads 14",
+      "AccommodationId": 14,
+      "Description": "Stor Campingplads",
+      "X": 255,
+      "Y": 220,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads15",
+      "Title": "Plads 15",
+      "AccommodationId": 15,
+      "Description": "Stor Campingplads",
+      "X": 285,
+      "Y": 235,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads16",
+      "Title": "Plads 16",
+      "AccommodationId": 16,
+      "Description": "Stor Campingplads",
+      "X": 130,
+      "Y": 190,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads17",
+      "Title": "Plads 17",
+      "AccommodationId": 17,
+      "Description": "Stor Campingplads",
+      "X": 160,
+      "Y": 205,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads18",
+      "Title": "Plads 18",
+      "AccommodationId": 18,
+      "Description": "Stor Campingplads",
+      "X": 190,
+      "Y": 222,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads19",
+      "Title": "Plads 19",
+      "AccommodationId": 19,
+      "Description": "Stor Campingplads",
+      "X": 220,
+      "Y": 235,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads20",
+      "Title": "Plads 20",
+      "AccommodationId": 20,
+      "Description": "Stor Campingplads",
+      "X": 250,
+      "Y": 250,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads21",
+      "Title": "Plads 21",
+      "AccommodationId": 21,
+      "Description": "Stor Campingplads",
+      "X": 430,
+      "Y": 210,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads22",
+      "Title": "Plads 22",
+      "AccommodationId": 22,
+      "Description": "Stor Campingplads",
+      "X": 470,
+      "Y": 200,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads23",
+      "Title": "Plads 23",
+      "AccommodationId": 23,
+      "Description": "Stor Campingplads",
+      "X": 500,
+      "Y": 185,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads24",
+      "Title": "Plads 24",
+      "AccommodationId": 24,
+      "Description": "Stor Campingplads",
+      "X": 390,
+      "Y": 227,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads25",
+      "Title": "Plads 25",
+      "AccommodationId": 25,
+      "Description": "Stor Campingplads",
+      "X": 420,
+      "Y": 240,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads26",
+      "Title": "Plads 26",
+      "AccommodationId": 26,
+      "Description": "Stor Campingplads",
+      "X": 475,
+      "Y": 235,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads27",
+      "Title": "Plads 27",
+      "AccommodationId": 27,
+      "Description": "Stor Campingplads",
+      "X": 505,
+      "Y": 220,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads28",
+      "Title": "Plads 28",
+      "AccommodationId": 28,
+      "Description": "Stor Campingplads",
+      "X": 535,
+      "Y": 205,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads29",
+      "Title": "Plads 29",
+      "AccommodationId": 29,
+      "Description": "Stor Campingplads",
+      "X": 345,
+      "Y": 245,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads30",
+      "Title": "Plads 30",
+      "AccommodationId": 30,
+      "Description": "Stor Campingplads",
+      "X": 375,
+      "Y": 260,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads31",
+      "Title": "Plads 31",
+      "AccommodationId": 31,
+      "Description": "Stor Campingplads",
+      "X": 405,
+      "Y": 275,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads32",
+      "Title": "Plads 32",
+      "AccommodationId": 32,
+      "Description": "Stor Campingplads",
+      "X": 480,
+      "Y": 275,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads33",
+      "Title": "Plads 33",
+      "AccommodationId": 33,
+      "Description": "Stor Campingplads",
+      "X": 510,
+      "Y": 260,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads34",
+      "Title": "Plads 34",
+      "AccommodationId": 34,
+      "Description": "Stor Campingplads",
+      "X": 545,
+      "Y": 240,
+      "category": "plads"
+    },
+    {
+      "Key": "Plads35",
+      "Title": "Plads 35",
+      "AccommodationId": 35,
+      "Description": "Stor Campingplads",
+      "X": 575,
+      "Y": 225,
+      "category": "plads"
+    }
+  ]
+}

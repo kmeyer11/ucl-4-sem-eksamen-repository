@@ -1,0 +1,81 @@
+﻿@page
+@model Danplanner.Client.Pages.AccommodationModel
+@{
+    ViewData["Title"] = "Accommodations";
+}
+
+<style>
+    .accom-topbar {background: #222;color: #fff;padding: 22px;display: flex;justify-content: space-between;align-items: center;}
+    .accom-dates {background: #fff;color: #000;padding: 10px 14px;border-radius: 4px;display: flex;gap: 20px;}
+    .accom-thumb {width: 220px;height: 165px;object-fit: cover;border: 1px solid #ddd;border-radius: 6px;}
+    .accom-item {display: flex;gap: 24px;align-items: flex-start;margin-bottom: 28px;flex-wrap: nowrap;}
+    .accom-desc {flex: 1;min-width: 200px;}
+    .accom-desc p {font-size: 1.05rem;}
+    .price-box {width: 170px;border :1px solid #ccc;padding: 14px;background: #f8f8f8;}
+    .price-box button {transform: scale(1.1);}
+    .accom-grid {display: grid;grid-template-columns: 1fr 340px;gap: 30px;align-items: start;margin-top: 30px;}
+    .contact-box {border: 1px solid #333;background: #f7f7f7;padding: 18px;width: 300px;border-radius: 6px;font-size: 1.05rem;}
+</style>
+
+<div class="accom-topbar">
+    <div class="accom-dates">
+        <div><strong>Ankomst:</strong> @Model.StartDisplay</div>
+        <div><strong>Afrejse:</strong> @Model.EndDisplay</div>
+        <div><strong>Dage:</strong> @Model.Days</div>
+    </div>
+    @if (!(ViewBag.hideBackButton as bool? ?? false))
+    {
+        <button class="btn-back" onclick="window.history.back();">
+            Tilbage
+        </button>
+    }
+</div>
+
+<div class="accom-grid">
+    <div>
+        @foreach (var item in Model.Items)
+        {
+            <div class="accom-item">
+                <img src="@(item.ImageUrl)" alt="@item.AccommodationName" class="accom-thumb" />
+                <div class="accom-desc">
+                    <h5>@item.AccommodationName</h5>
+                    <p>@item.AccommodationDescription</p>
+                </div>
+                <div class="price-box">
+                    <strong>Pris:</strong>
+                    <p>@item.PricePerNight kr./nat</p>
+
+                    <form method="post" asp-page-handler="Select" style="display:inline;">
+                        <input type="hidden" name="key" value="@item.AccommodationId" />
+                        <input type="hidden" name="Start" value="@(Model.Start ?? string.Empty)" />
+                        <input type="hidden" name="End" value="@(Model.End ?? string.Empty)" />
+						<input type="hidden" name="category" value="@(item.Category ?? string.Empty)" />
+                        <button type="submit" class="btn btn-sm btn-primary">Vælg</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+
+    <aside class="accom-aside">
+        <div class="contact-box">
+            <h6><span class="badge bg-dark">i</span> Kontakt Information</h6>
+            <p><strong>Tlf:</strong> @Model.ContactInformation.ContactPhoneNumber</p>
+            <p><strong>Email:</strong> @Model.ContactInformation.ContactEmail</p>
+            <p><strong>Addresse:</strong> @Model.ContactInformation.ContactAdress</p>
+        </div>
+    </aside>
+</div>
+
+<script>
+(function () {
+    function updateTopbarHeight() {
+        var topbar = document.querySelector('.accom-topbar');
+        var height = topbar ? topbar.offsetHeight : 0;
+        document.documentElement.style.setProperty('--accom-topbar-height', height + 'px');
+    }
+    window.addEventListener('load', updateTopbarHeight);
+    window.addEventListener('resize', updateTopbarHeight);
+    updateTopbarHeight();
+})();
+</script>

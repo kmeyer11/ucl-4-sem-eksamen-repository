@@ -1,0 +1,209 @@
+﻿@page
+@model Danplanner.Client.Pages.MapModel
+@{
+    ViewData["Title"] = "Vælg plads";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    .page-top { background:#222; padding:16px; color:#fff; margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; }
+    .top-left { font-weight:700; }
+    .accom-dates {background: #fff;color: #000;padding: 10px 14px;border-radius: 4px;display: flex;gap: 20px;}
+    .map-wrapper { display:flex; gap:20px; align-items:flex-start; }
+    #map { width: 100%; max-width: 1100px; height: 600px; border: 1px solid #ddd; background:#eee; }
+    .map-side { width: 320px; }
+    .points-list { list-style:none; padding:0; margin:0; }
+    .points-list li { padding:10px; border-bottom:1px solid #eee; cursor:pointer; }
+    .points-list li:hover { background:#fafafa; }
+    .selected { background:#e9f5ff; }
+    .map-legend { font-size:0.9rem; color:#333; margin-bottom:12px; }
+    .media (max-width: 991.98px) {
+        .map-wrapper { flex-direction:column; }
+        #map { height:400px; max-width:100%; }
+        .map-side { width:100%; }
+    }
+</style>
+
+<div class="page-top">
+    <div class="top-left">
+        <div class="accom-dates" style="background:#fff;color:#000;padding:8px 12px;border-radius:6px;">
+            <span><strong>Ankomst:</strong> @Model.Start</span>
+            <span style="margin-left:12px;"><strong>Afrejse:</strong> @Model.End</span>
+        </div>
+    </div>
+    <div class="top-right">
+        @if (!(ViewBag.hideBackButton as bool? ?? false))
+        {
+            <button class="btn-back" onclick="window.history.back();">
+                Tilbage
+            </button>
+        }
+    </div>
+</div>
+
+<div class="map-wrapper">
+    <div id="map" aria-label="Kort over campingplads"></div>
+    <div class="map-side" aria-hidden="false">
+        <div class="map-legend"><strong>Pladser / Hytter</strong></div>
+        <select id="points" class="points-dropdown">
+    <option value="">Vælg plads...</option>
+</select>
+    </div>
+</div>
+<form method="post" asp-antiforgery="true" id="antiforgeryForm" style="display:none"></form>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    const mapDef = @Html.Raw(Model.FilteredMapJson);
+    const startQuery = '@(Model.Start ?? string.Empty)';
+    const endQuery = '@(Model.End ?? string.Empty)';
+    const preselected = '@(Model.SelectedKey ?? "")';
+
+    const defaultIcon = L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    const map = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: -5,
+        maxZoom: 2,
+        zoomControl: true,
+        attributionControl: false
+    });
+
+    const bounds = [[0, 0], [mapDef.Height, mapDef.Width]];
+    const image = L.imageOverlay(mapDef.ImageUrl, bounds).addTo(map);
+
+    map.fitBounds(bounds);
+
+    const markers = {};
+    const listEl = document.getElementById('points');
+        listEl.addEventListener('change', () => {
+        if (listEl.value) {
+            selectPoint(listEl.value);
+        }
+    });
+
+    function createIconFromUrl(url) {
+        return L.icon({
+            iconUrl: url,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14]
+        });
+    }
+
+    function selectPoint(key) {
+        const m = markers[key];
+        if (!m) return;
+
+        Array.from(listEl.options).forEach(o => {
+            o.selected = (o.value === key);
+        });
+
+        m.openPopup();
+        map.panTo(m.getLatLng(), { animate: true });
+    }
+
+    (function addPoints() {
+        (mapDef.Points || []).forEach(point => {
+            const lat = mapDef.Height - point.Y;
+            const lng = point.X;
+            const latlng = [lat, lng];
+
+            const marker = L.marker(latlng, { icon: defaultIcon }).addTo(map);
+
+            if (point.ImageUrl) {
+                const img = new Image();
+                img.onload = function () {
+                    try {
+                        const custom = createIconFromUrl(point.ImageUrl);
+                        marker.setIcon(custom);
+                    } catch (e) {
+                        console.warn('Failed to set custom icon for', point.Key, e);
+                    }
+                };
+                img.onerror = function () {
+                    console.warn('Custom icon failed to load for', point.Key, point.ImageUrl);
+                };
+                img.src = point.ImageUrl;
+            }
+
+            const popupHtml = `<div style="min-width:160px">
+                <strong>${escapeHtml(point.Title)}</strong>
+                <div style="margin-top:6px">${escapeHtml(point.Description || '')}</div>
+                <div style="margin-top:8px;text-align:right">
+                    <button data-key="${escapeHtml(point.Key)}" class="choose-btn btn-small">Vælg</button>
+                </div>
+            </div>`;
+            marker.bindPopup(popupHtml, { closeButton: true });
+
+            marker.on('popupopen', () => {
+            setTimeout(() => {
+                const btn = document.querySelector('.choose-btn[data-key="' + point.Key + '"]');
+                if (btn) {
+                    btn.addEventListener('click', async () => {
+                        const accommodationId = point.AccommodationId;
+                        const category = point.Category || "";
+                        const placeKey = point.Key;
+                        const payload = {
+                            accommodationId: accommodationId,
+                            start: startQuery,
+                            end: endQuery,
+                            placeKey: placeKey
+                        };
+                        const afInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                        const token = afInput ? afInput.value : null;
+
+                        const r = await fetch('?handler=Lock', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': token 
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!r.ok) {
+                            alert('Kunne ikke oprette reservation lock (netværk). Prøv igen.');
+                            return;
+                        }
+
+                        const data = await r.json();
+                        if (data.success) {
+                            const url = `/Confirmation?Start=${encodeURIComponent(startQuery)}&End=${encodeURIComponent(endQuery)}&accommodationId=${encodeURIComponent(accommodationId)}&category=${encodeURIComponent(category)}&placeKey=${encodeURIComponent(placeKey)}&lockToken=${encodeURIComponent(data.token)}`;
+                            window.location.href = url;
+                        } else {
+                            alert('Denne plads er allerede reserveret af en anden bruger: ' + (data.message || ''));
+                        }
+                    });
+                }
+            }, 10);
+            });
+
+            markers[point.Key] = marker;
+
+            const opt = document.createElement('option');
+            opt.value = point.Key;
+            opt.textContent = point.Title;
+            listEl.appendChild(opt);
+            });
+
+        if (preselected) {
+            setTimeout(() => selectPoint(preselected), 250);
+        }
+    })();
+
+    function escapeHtml(s) {
+        if (!s) return '';
+        return s.replace(/[&<>"'`=\/]/g, function (c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;', '/':'&#x2F;','`':'&#x60;','=':'&#x3D;' })[c]; });
+    }
+</script>
+

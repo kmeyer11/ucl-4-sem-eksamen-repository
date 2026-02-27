@@ -1,0 +1,57 @@
+﻿@page
+@model Danplanner.Client.Pages.Admin.CalendarModel
+@{
+    ViewData["Title"] = "Calendar";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+
+<div class="d-flex" style="min-height: 80vh;">
+    <div class="sidebar d-flex flex-column">
+        <div class="sidebar-header">Admin Panel</div>
+        <nav class="nav flex-column">
+            <a class="nav-link" asp-page="/Admin/Users"><i class="bi bi-people"></i> Brugere</a>
+            <a class="nav-link" asp-page="/Admin/Addons"><i class="bi bi-bag-plus"></i> Tilkøb</a>
+            <a class="nav-link" asp-page="/Admin/Packages"><i class="bi bi-box-seam"></i> Pakke-løsninger</a>
+            <a class="nav-link" asp-page="/Admin/Seasons"><i class="bi bi-calendar-range"></i> Sæsoner</a>
+            <a class="nav-link" asp-page="/Admin/Map"><i class="bi bi-grid-1x2"></i> Pladskort</a>
+            <a class="nav-link" asp-page="/Admin/Calendar"><i class="bi bi-calendar3"></i> Kalender</a>
+            <a class="nav-link" asp-page="/Admin/Log"><i class="bi bi-journal-text"></i> Logbog</a>
+        </nav>
+    </div>    
+</div>
+
+<style>
+    .sidebar {
+        width: 220px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        padding: 1rem;
+    }
+
+        .sidebar .nav-link {
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .sidebar .nav-link:hover {
+                background-color: #e9ecef;
+                border-radius: 5px;
+                color: #0d6efd;
+            }
+
+        .sidebar .nav-item .dropdown-menu {
+            background-color: #f8f9fa;
+            border: none;
+        }
+
+    .sidebar-header {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+    }
+</style>

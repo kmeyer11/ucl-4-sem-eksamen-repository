@@ -1,0 +1,3 @@
+ContactPhoneNumber=12345678
+ContactEmail=danplanner.service@gmail.com
+ContactAdress=Strandvej 1, 0001 Byvedstranden

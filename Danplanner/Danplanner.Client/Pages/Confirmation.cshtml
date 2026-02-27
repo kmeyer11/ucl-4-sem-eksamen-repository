@@ -1,0 +1,330 @@
+﻿@page
+@model Danplanner.Client.Pages.ConfirmationModel
+@{
+    ViewData["Title"] = "Confirmation";
+}
+
+<div class="confirm-grid">
+
+    <form method="post" class="w-100">
+
+        <div class="form-box">
+            <h5>Dine oplysninger</h5>
+
+            <div class="form-fields">
+                <input class="form-control" asp-for="NewUserName" placeholder="Navn" />
+                <span asp-validation-for="NewUserName" class="text-danger"></span>
+
+                <input class="form-control" asp-for="NewUserEmail" placeholder="Email" />
+                <span asp-validation-for="NewUserEmail" class="text-danger"></span>
+
+                <input id="address-input" class="form-control" asp-for="NewUserAdress" placeholder="Adresse" autocomplete="off" />
+                <ul id="suggestions" class="list-group"></ul>
+                <input type="hidden" asp-for="AddressConfirmed" id="address-confirmed" />
+            </div>
+        </div>
+
+        <div class="accom-box">
+
+            <div class="accom-header">
+                <div class="accom-info">
+                    <h4>@Model.SelectedAccommodation?.AccommodationName</h4>
+                    <p class="accom-desc">@Model.SelectedAccommodation?.AccommodationDescription</p>
+                </div>
+
+                <div class="date-box">
+                    <div><strong>Ankomst:</strong> @Model.StartDisplay</div>
+                    <div><strong>Afrejse:</strong> @Model.EndDisplay</div>
+                    <div><strong>Dage:</strong> @Model.Days</div>
+                </div>
+            </div>
+
+            <div class="price-box-confirm">
+    <div><strong>Pris pr. nat:</strong></div>
+
+                @if (Model.NightlySeasonPrices != null && Model.NightlySeasonPrices.Count > 0)
+                {
+                    var seasonSummary = new Dictionary<string, (decimal BasePrice, decimal Diff, int NightsCount)>();
+
+                    for (int i = 0; i < Model.NightlySeasonPrices.Count; i++)
+                    {
+                        var seasonName = Model.SeasonNames[i];
+                        var basePrice = Model.NightlyBasePrices[i];
+                        var seasonalPrice = Model.NightlySeasonPrices[i];
+                        var diff = seasonalPrice - basePrice;
+
+                        if (!seasonSummary.ContainsKey(seasonName))
+                        {
+                            seasonSummary[seasonName] = (basePrice, diff, 1);
+                        }
+                        else
+                        {
+                            var current = seasonSummary[seasonName];
+                            seasonSummary[seasonName] = (current.BasePrice, current.Diff, current.NightsCount + 1);
+                        }
+                    }
+        <ul>
+                        @foreach (var season in seasonSummary)
+                        {
+                    <li style="margin-bottom: 12px;">
+                        <strong>@season.Key:</strong><br />
+                        @season.Value.BasePrice.ToString("F2") kr.<br />
+                        <span style="margin-left: 10px;">+ @season.Value.Diff.ToString("F2") kr.</span><br />
+                    </li>
+                        }
+        </ul>
+                }
+                else
+                {
+                     <div>@Model.PricePerNightWithSeason?.ToString("F2") kr.</div>
+                }
+
+</div>
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input type="hidden" asp-for="AccommodationId" />
+            <input type="hidden" asp-for="Start" />
+            <input type="hidden" asp-for="End" />
+            <input type="hidden" asp-for="Category" />
+
+            @foreach (var addon in Model.Addons)
+            {
+                <label>
+                    <input type="checkbox" 
+                           name="SelectedAddonIds"
+                               value="@addon.AddonId"/>
+                    @addon.AddonName (@addon.AddonPrice kr.)
+                </label>
+            }
+
+            <div class="guest-item">
+                <label class="guest-label" for="BookingResidents">Antal pers:</label>
+                <input asp-for="BookingResidents" id="BookingResidents" type="number" min="1" value="1" class="form-control" />
+            </div>
+
+
+            <div class="total-box">
+                <div>Total pris:</div>
+                <div>@Model.TotalPriceDisplay</div>
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="admin-discount-box">
+                    <h5>Admin rabat</h5>
+
+                    <div class="d-flex gap-2 mb-2">
+                        <input asp-for="AdminDiscountPercent" id="AdminDiscountPercent" class="form-control" placeholder="Indtast rabat %" />
+
+                        <button type="submit" class="btn btn-success" name="applyDiscount" value="manual">Anvend rabat</button>
+                        <button type="submit" class="btn btn-success" name="applyDiscount" value="20"
+                                onclick="document.getElementById('AdminDiscountPercent').value='20'">
+                            20% rabat
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary pay-btn">Betal</button>
+        </div>
+
+    </form>
+
+    <aside class="accom-aside">
+        <div class="sticky-wrapper">
+            <div class="contact-box">
+                <h6><span class="badge bg-dark">i</span> Kontakt Information</h6>
+                <p><strong>Tlf:</strong> @Model.ContactInformation?.ContactPhoneNumber</p>
+                <p><strong>Email:</strong> @Model.ContactInformation?.ContactEmail</p>
+                <p><strong>Adresse:</strong> @Model.ContactInformation?.ContactAdress</p>
+            </div>
+        </div>
+    </aside>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+		const input = document.getElementById('address-input');
+		const list = document.getElementById('suggestions');
+		const confirmedInput = document.getElementById('address-confirmed');
+
+		input.addEventListener('input', async () => 
+        {
+            confirmedInput.value = "false";
+
+			if (input.value.length < 2) 
+            { list.innerHTML = ''; return; 
+        }
+
+			const response = await fetch(`?handler=AddressSuggestions&query=${input.value}`);
+            const data = await response.json();
+
+        list.innerHTML = data.map(x => `<li class='list-group-item' style='cursor:pointer'>${x}</li>`).join("");
+
+        list.querySelectorAll("li").forEach(li => li.onclick = () => 
+        {
+            input.value = li.textContent;
+            list.innerHTML = "";
+			confirmedInput.value = "true";
+        });
+		});
+    </script>
+}
+
+<style>
+    .confirm-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        grid-template-areas:
+            "form aside"
+            "accom aside";
+        gap: 24px;
+        align-items: start;
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0 12px;
+    }
+
+    .form-box {
+        grid-area: form;
+    }
+
+    .accom-box {
+        grid-area: accom;
+    }
+
+    .accom-aside {
+    grid-area: aside;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+}
+
+.sticky-wrapper {
+    position: relative;
+    max-height: calc(100vh - 20px);
+}
+
+.contact-box {
+    position: sticky;
+    top: 0;
+    border: 1px solid #333;
+    background: #f7f7f7;
+    padding: 12px;
+    border-radius: 4px;
+    overflow-y: auto;
+}
+
+
+    .form-box {
+        border: 1px solid #ccc;
+        background: #fafafa;
+        padding: 14px;
+        border-radius: 6px;
+    }
+
+    .form-fields {
+        display: grid;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .accom-box {
+        border: 1px solid #ccc;
+        background: #fff;
+        padding: 20px;
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .accom-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .accom-info h4 {
+        margin: 0 0 6px 0;
+    }
+
+    .accom-desc {
+        margin: 0;
+        color: #444;
+    }
+
+    .date-box div {
+        margin-bottom: 4px;
+        white-space: nowrap;
+    }
+
+    .price-box-confirm {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        font-size: 16px;
+    }
+
+    .guest-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .guest-label {
+        font-weight: 500;
+    }
+
+    .guest-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .guest-count {
+        min-width: 24px;
+        text-align: center;
+        display: inline-block;
+    }
+
+    .small-btn {
+        padding: 2px 8px;
+        font-size: 0.8rem;
+        height: 28px;
+    }
+
+    .section-title {
+        margin: 0 0 10px 0;
+    }
+
+    .addon-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .addon-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .total-box {
+        display: flex;
+        justify-content: space-between;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .pay-btn {
+        width: 100%;
+        padding: 12px;
+    }
+
+</style>

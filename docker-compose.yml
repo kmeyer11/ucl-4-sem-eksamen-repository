@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  gateway:
+    build: ./Gateway
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - notification_service
+    networks:
+      - appnet
+
+  notification_service:
+    build: ./NotificationService
+    environment:
+      - ASPNETCORE_URLS=http://+:5002
+    ports:
+      - "5002:5002"
+    healthcheck:
+      test: [ "CMD", "curl", "-fsS", "http://localhost:5002/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
