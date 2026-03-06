@@ -119,7 +119,7 @@ namespace Danplanner.Application.Services
                     var otp = new UserOtp
                     {
                         Code = code,
-                        Expiration = DateTime.UtcNow.AddMinutes(1)
+                        Expiration = DateTime.UtcNow.AddMinutes(10)
                     };
 
                     _userOtps[request.Email] = otp;
@@ -128,7 +128,7 @@ namespace Danplanner.Application.Services
                     await _emailService.SendEmailAsync(
                         request.Email,
                         "Your OTP Code",
-                        $"Your OTP code is <b>{code}</b>. It expires in 5 minutes."
+                        $"Your OTP code is <b>{code}</b>. It expires in 10 minutes."
                     );
 
                     return "OTP_SENT";
