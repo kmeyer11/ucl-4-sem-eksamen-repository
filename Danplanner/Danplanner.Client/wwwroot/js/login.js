@@ -1,4 +1,29 @@
-﻿$(function () {
+﻿// Simple client-side rate limiter
+// maxAttempts per windowMs milliseconds per key
+const rateLimiter = (function () {
+    const attempts = {};
+
+    return {
+        check: function (key, maxAttempts, windowMs) {
+            const now = Date.now();
+            if (!attempts[key]) attempts[key] = [];
+
+            // Drop entries outside the window
+            attempts[key] = attempts[key].filter(t => now - t < windowMs);
+
+            if (attempts[key].length >= maxAttempts) {
+                const retryAfter = Math.ceil((windowMs - (now - attempts[key][0])) / 1000);
+                alert("For mange forsøg. Prøv igen om " + retryAfter + " sekunder.");
+                return false;
+            }
+
+            attempts[key].push(now);
+            return true;
+        }
+    };
+})();
+
+$(function () {
     const loginModalEl = document.getElementById('loginModal');
     const loginModal = new bootstrap.Modal(loginModalEl);
 
@@ -15,6 +40,7 @@
 
         if (identifier.includes("@")) {
             // USER → REQUEST OTP
+            if (!rateLimiter.check("request-code", 5, 60000)) return;
             $.ajax({
                 type: "POST",
                 url: "/api/auth/user/request-code",
@@ -44,6 +70,7 @@
                 return;
             }
 
+            if (!rateLimiter.check("check-id", 5, 60000)) return;
             $.ajax({
                 type: "POST",
                 url: "/api/auth/admin/check-id",
@@ -89,6 +116,7 @@
                 return;
             }
 
+            if (!rateLimiter.check("verify-code", 5, 60000)) return;
             $.ajax({
                 type: "POST",
                 url: "/api/auth/user/verify-code",
@@ -115,6 +143,7 @@
             }
 
 
+            if (!rateLimiter.check("admin-login", 5, 60000)) return;
             $.ajax({
                 type: "POST",
                 url: "/api/auth/login",

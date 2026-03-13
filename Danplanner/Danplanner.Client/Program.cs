@@ -23,7 +23,8 @@ using Danplanner.Application.Interfaces.ConfirmationInterfaces;
 using Danplanner.Persistence.Repositories.SeasonRepositories;
 using Danplanner.Application.Interfaces.SeasonInterfaces;
 using Danplanner.Application.Interfaces.ReservationInterfaces;
-
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +101,22 @@ builder.Services.AddScoped<ISeasonAdd, SeasonRepositoryPost>();
 builder.Services.AddScoped<ISeasonGetById, SeasonRepositoryGet>();
 builder.Services.AddScoped<ISeasonGetAll, SeasonRepositoryGet>();
 
+// Security builders
+builder.Services.AddSingleton<InMemoryBruteForceCache>();
+builder.Services.AddScoped<IBruteForceService, BruteForceService>();
+
+// Rate limiter
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("fixed", opt =>
+    {
+        opt.PermitLimit = 10;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+});
+
 // Confirmation builders
 builder.Services.AddScoped<IOrderPricing, OrderPricingService>();
 builder.Services.AddScoped<IParseDate, ParseDateService>();
@@ -132,6 +149,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
+
+app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
