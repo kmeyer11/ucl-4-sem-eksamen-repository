@@ -1,16 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Danplanner.Infrastructure.Services
 {
     public class InMemoryBruteForceCache
     {
-        private readonly InMemoryBruteForceCache _cache;
+        private readonly IMemoryCache _cache;
 
-        public InMemoryBruteForceCache(InMemoryBruteForceCache cache)
+        public InMemoryBruteForceCache(IMemoryCache cache)
         {
             _cache = cache;
         }
@@ -24,25 +20,25 @@ namespace Danplanner.Infrastructure.Services
         public void IncreaseFailedAttempts(string username, TimeSpan expire)
         {
             var count = GetFailedAttempts(username) + 1;
-            _cache.Set(AttemptsKey(username), count, expire);
+            _cache.Set(AttemptsKey(username), count, DateTimeOffset.UtcNow.Add(expire));
         }
 
         public void SetLockedOut(string username, TimeSpan duration)
         {
-            _cache.Set(LockoutKey(username), true, duration);
+            _cache.Set(LockoutKey(username), true, DateTimeOffset.UtcNow.Add(duration));
         }
 
         public bool IsLockedOut(string username)
         {
-            return _cache.TryGetValue(LockedoutKey(username), out bool _);
+            return _cache.TryGetValue(LockoutKey(username), out bool _);
         }
 
         public void ResetAttempts(string username)
         {
             _cache.Remove(AttemptsKey(username));
-            _cache.Remove(AttemptsKey(username));
+            _cache.Remove(LockoutKey(username));
         }
-        
+
         private static string AttemptsKey(string username) => $"attempts:{username}";
         private static string LockoutKey(string username) => $"lockout:{username}";
     }

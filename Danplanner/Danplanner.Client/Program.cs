@@ -102,7 +102,7 @@ builder.Services.AddScoped<ISeasonGetById, SeasonRepositoryGet>();
 builder.Services.AddScoped<ISeasonGetAll, SeasonRepositoryGet>();
 
 // Security builders
-builder.Services.AddSingleton<InMemoryBruteForceCache>();
+builder.Services.AddSingleton<Danplanner.Infrastructure.Services.InMemoryBruteForceCache>();
 builder.Services.AddScoped<IBruteForceService, BruteForceService>();
 
 // Rate limiter
