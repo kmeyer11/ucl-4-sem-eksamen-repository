@@ -28,6 +28,9 @@ namespace Danplanner.Persistence.Repositories.UserRepositories
             user.UserEmail = userDto.UserEmail;
             user.UserMobile = userDto.UserMobile;
             user.UserAdress = userDto.UserAdress;
+            user.IsLocked = userDto.IsLocked;
+            user.LockedSince = userDto.LockedSince;
+            user.LockedReason = userDto.LockedReason;
 
             await _dbManager.SaveChangesAsync();
 
@@ -37,9 +40,19 @@ namespace Danplanner.Persistence.Repositories.UserRepositories
                 UserName = user.UserName,
                 UserEmail = user.UserEmail,
                 UserMobile = user.UserMobile,
-                UserAdress = user.UserAdress
+                UserAdress = user.UserAdress,
+                IsLocked = user.IsLocked,
+                LockedSince = user.LockedSince,
+                LockedReason = user.LockedReason
             };
+        }
 
+        public async Task<UserDto?> LockUser(UserDto userDto)
+        {
+            userDto.IsLocked = true;
+            userDto.LockedSince = DateTime.UtcNow;
+            userDto.LockedReason = "User compromised";
+            return await UpdateUserAsync(userDto);
         }
     }
 }

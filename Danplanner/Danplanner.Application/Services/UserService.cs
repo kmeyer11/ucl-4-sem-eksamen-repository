@@ -1,10 +1,10 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 using Danplanner.Application.Interfaces.UserInterfaces;
 using Danplanner.Application.Models.ModelsDto;
 
 namespace Danplanner.Application.Services
 {
-    public class UserService : IUserGetAll, IUserGetById
+    public class UserService : IUserGetAll, IUserGetById, IUserUpdate
     {
         private readonly HttpClient _httpClient;
 
@@ -25,11 +25,19 @@ namespace Danplanner.Application.Services
             return await _httpClient.GetFromJsonAsync<UserDto?>($"https://localhost:7026/api/user/{userId}");
         }
 
-        public async Task<UserDto> UpdateUser(UserDto userDto)
+        public async Task<UserDto> UpdateUserAsync(UserDto userDto)
         {
-            var response = await _httpClient.PutAsJsonAsync("https://localhost:7026/api/user", userDto);
+            var response = await _httpClient.PutAsJsonAsync($"https://localhost:7026/api/user/{userDto.UserId}", userDto);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<UserDto>();
+        }
+
+        public async Task<UserDto?> LockUser(UserDto userDto)
+        {
+            userDto.IsLocked = true;
+            userDto.LockedSince = DateTime.UtcNow;
+            userDto.LockedReason = "User compromised";
+            return await UpdateUserAsync(userDto);
         }
     }
 }
