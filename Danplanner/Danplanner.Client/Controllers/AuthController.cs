@@ -9,6 +9,8 @@ using Danplanner.Application.Interfaces.AdminInterfaces;
 using Danplanner.Application.Interfaces.AuthInterfaces.IUserRegister;
 using Danplanner.Application.Interfaces.AuthInterfaces.IUserLogin;
 using Danplanner.Application.Interfaces.AuthInterfaces;
+using Danplanner.Application.Interfaces.BruteForceDetectionInterfaces;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Danplanner.Client.Controllers
 {
@@ -24,16 +26,18 @@ namespace Danplanner.Client.Controllers
         private readonly IUserVerifyLoginCode _userVerifyLoginCode;
         private readonly IUserRequestRegisterCode _userRequestRegisterCode;
         private readonly IUserVerifyRegisterCode _userVerifyRegisterCode;
+        private readonly IBruteForceDetection _bruteForce;
 
-        public AuthController( 
-            IAdminGetById adminIdService, 
-            IAdminRegister adminRegisterService, 
-            ILogin loginService, 
-            IUserRegister userRegisterService, 
-            IUserRequestLoginCode userRequestLoginCode, 
+        public AuthController(
+            IAdminGetById adminIdService,
+            IAdminRegister adminRegisterService,
+            ILogin loginService,
+            IUserRegister userRegisterService,
+            IUserRequestLoginCode userRequestLoginCode,
             IUserVerifyLoginCode userVerifyLoginCode,
             IUserRequestRegisterCode userRequestRegisterCode,
-            IUserVerifyRegisterCode userVerifyRegisterCode
+            IUserVerifyRegisterCode userVerifyRegisterCode,
+            IBruteForceDetection bruteForce
             )
         {
             _adminGetById = adminIdService;
@@ -44,6 +48,7 @@ namespace Danplanner.Client.Controllers
             _userVerifyLoginCode = userVerifyLoginCode;
             _userRequestRegisterCode = userRequestRegisterCode;
             _userVerifyRegisterCode = userVerifyRegisterCode;
+            _bruteForce = bruteForce;
         }
 
         [HttpPost("register")]
@@ -102,12 +107,21 @@ namespace Danplanner.Client.Controllers
             return Ok("Login code sent to your email.");
         }
 
+        [EnableRateLimiting("fixed")]
         [HttpPost("user/verify-code")]
         public async Task<ActionResult<string>> VerifyUserCode([FromBody] VerifyCodeDto request)
         {
+            if (_bruteForce.IsLockedOut(request.UserEmail))
+                return StatusCode(429, "Too many failed attempts. Try again later.");
+
             var token = await _userVerifyLoginCode.VerifyUserLoginCodeAsync(request.UserEmail, request.Code);
             if (token == null)
+            {
+                _bruteForce.RecordFailedAttempt(request.UserEmail);
                 return BadRequest("Invalid code.");
+            }
+
+            _bruteForce.RecordSuccessfulLogin(request.UserEmail);
 
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);
