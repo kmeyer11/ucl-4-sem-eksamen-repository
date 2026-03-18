@@ -161,6 +161,7 @@ namespace Danplanner.Application.Services
         {
             var user = await _userRepository.GetUserByEmailAsync(email);
             if (user == null) return false;
+            if (user.IsLocked) return false;
 
             var code = new Random().Next(100000, 999999).ToString();
             var otp = new UserOtp
@@ -226,6 +227,7 @@ namespace Danplanner.Application.Services
 
             var user = await _userRepository.GetUserByEmailAsync(email);
             if (user == null) return null;
+            if (user.IsLocked) return null;
 
             return CreateTokenForUser(user);
         }
