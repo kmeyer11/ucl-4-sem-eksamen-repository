@@ -27,7 +27,10 @@ namespace Danplanner.Persistence.Repositories.UserRepositories
                     UserName = u.UserName,
                     UserEmail = u.UserEmail,
                     UserMobile = u.UserMobile,
-                    UserAdress = u.UserAdress
+                    UserAdress = u.UserAdress,
+                    IsLocked = u.IsLocked,
+                    LockedSince = u.LockedSince,
+                    LockedReason = u.LockedReason
                 })
                 .ToListAsync();
         }
@@ -61,7 +64,10 @@ namespace Danplanner.Persistence.Repositories.UserRepositories
                 UserName = user.UserName,
                 UserEmail = user.UserEmail,
                 UserMobile = user.UserMobile,
-                UserAdress = user.UserAdress
+                UserAdress = user.UserAdress,
+                IsLocked = user.IsLocked,
+                LockedSince = user.LockedSince,
+                LockedReason = user.LockedReason
             };
         }
     }
