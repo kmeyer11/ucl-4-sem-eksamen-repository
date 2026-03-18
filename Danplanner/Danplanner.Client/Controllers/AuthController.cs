@@ -10,6 +10,7 @@ using Danplanner.Application.Interfaces.AuthInterfaces.IUserRegister;
 using Danplanner.Application.Interfaces.AuthInterfaces.IUserLogin;
 using Danplanner.Application.Interfaces.AuthInterfaces;
 using Danplanner.Application.Interfaces.BruteForceDetectionInterfaces;
+using Danplanner.Application.Interfaces.UserInterfaces;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace Danplanner.Client.Controllers
@@ -27,6 +28,8 @@ namespace Danplanner.Client.Controllers
         private readonly IUserRequestRegisterCode _userRequestRegisterCode;
         private readonly IUserVerifyRegisterCode _userVerifyRegisterCode;
         private readonly IBruteForceDetection _bruteForce;
+        private readonly IUserGetByEmail _userGetByEmail;
+        private readonly IUserUpdate _userUpdate;
 
         public AuthController(
             IAdminGetById adminIdService,
@@ -37,7 +40,9 @@ namespace Danplanner.Client.Controllers
             IUserVerifyLoginCode userVerifyLoginCode,
             IUserRequestRegisterCode userRequestRegisterCode,
             IUserVerifyRegisterCode userVerifyRegisterCode,
-            IBruteForceDetection bruteForce
+            IBruteForceDetection bruteForce,
+            IUserGetByEmail userGetByEmail,
+            IUserUpdate userUpdate
             )
         {
             _adminGetById = adminIdService;
@@ -49,6 +54,8 @@ namespace Danplanner.Client.Controllers
             _userRequestRegisterCode = userRequestRegisterCode;
             _userVerifyRegisterCode = userVerifyRegisterCode;
             _bruteForce = bruteForce;
+            _userGetByEmail = userGetByEmail;
+            _userUpdate = userUpdate;
         }
 
         [HttpPost("register")]
@@ -118,6 +125,14 @@ namespace Danplanner.Client.Controllers
             if (token == null)
             {
                 _bruteForce.RecordFailedAttempt(request.UserEmail);
+
+                if (_bruteForce.IsLockedOut(request.UserEmail))
+                {
+                    var user = await _userGetByEmail.GetUserByEmailAsync(request.UserEmail);
+                    if (user != null)
+                        await _userUpdate.LockUser(user);
+                }
+
                 return BadRequest("Invalid code.");
             }
 
