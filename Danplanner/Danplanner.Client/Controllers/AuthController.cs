@@ -86,6 +86,13 @@ namespace Danplanner.Client.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto request)
         {
+            if (!string.IsNullOrEmpty(request.Email))
+            {
+                var user = await _userGetByEmail.GetUserByEmailAsync(request.Email);
+                if (user != null && user.IsLocked)
+                    return StatusCode(403, "Din konto er låst. Kontakt venligst support.");
+            }
+
             var token = await _loginService.LoginAsync(request);
 
             if (token == null)
@@ -108,10 +115,14 @@ namespace Danplanner.Client.Controllers
         [HttpPost("user/request-code")]
         public async Task<IActionResult> RequestUserCode([FromBody] RequestCodeDto request)
         {
-            var success = await _userRequestLoginCode.RequestUserLoginCodeAsync(request.UserEmail);
-            if (!success)
-                return NotFound("User not found.");
-            return Ok("Login code sent to your email.");
+            var user = await _userGetByEmail.GetUserByEmailAsync(request.UserEmail);
+            if (user == null)
+                return NotFound("Bruger ikke fundet.");
+            if (user.IsLocked)
+                return StatusCode(403, "Din konto er låst. Kontakt venligst support.");
+
+            await _userRequestLoginCode.RequestUserLoginCodeAsync(request.UserEmail);
+            return Ok("Login kode sendt til din email.");
         }
 
         [EnableRateLimiting("fixed")]
