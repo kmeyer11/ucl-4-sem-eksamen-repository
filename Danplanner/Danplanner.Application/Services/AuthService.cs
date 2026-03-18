@@ -112,6 +112,7 @@ namespace Danplanner.Application.Services
             {
                 var user = await _userRepository.GetUserByEmailAsync(request.Email);
                 if (user == null) return null;
+                if (user.IsLocked) return null;
 
                 if (string.IsNullOrEmpty(request.Code))
                 {
