@@ -106,7 +106,7 @@ builder.Services.AddScoped<ISeasonGetAll, SeasonRepositoryGet>();
 // Security builders
 builder.Services.AddSingleton<Danplanner.Application.Services.InMemoryBruteForceCache>();
 builder.Services.AddScoped<IBruteForceDetection, BruteForceService>();
-builder.Services.AddScoped<ISecurityLogger, SecurityLogService>();
+builder.Services.AddScoped<ISecurityLogger, SecurityLogRepository>();
 
 // Rate limiter
 builder.Services.AddRateLimiter(options =>
