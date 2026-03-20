@@ -13,7 +13,9 @@ namespace Danplanner.Domain.Entities
         public int? AdminId { get; set; }
         [Required]
         public string LogType { get; set; }
+        [Required]
         public string? AffectedEmail { get; set; }
+        [Required]
         public string? IpAddress { get; set; }
     }
 }

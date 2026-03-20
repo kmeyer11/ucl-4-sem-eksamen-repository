@@ -2,13 +2,13 @@ using Danplanner.Application.Interfaces.LogInterfaces;
 using Danplanner.Domain.Entities;
 using Danplanner.Persistence.DbMangagerDir;
 
-namespace Danplanner.Application.Services
+namespace Danplanner.Persistence.Repositories
 {
-    public class SecurityLogService : ISecurityLogger
+    public class SecurityLogRepository : ISecurityLogger
     {
         private readonly DbManager _db;
 
-        public SecurityLogService(DbManager db)
+        public SecurityLogRepository(DbManager db)
         {
             _db = db;
         }
