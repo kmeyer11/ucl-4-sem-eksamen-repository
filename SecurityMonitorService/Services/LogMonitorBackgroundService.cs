@@ -13,7 +13,7 @@ namespace SecurityMonitorService.Services
         private DateTime _lastAlertSent = DateTime.MinValue;
 
         // Kør analyse hvert 5. minut
-        private readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
+        private readonly TimeSpan _interval = TimeSpan.FromMinutes(1);
 
         // Kig kun på logs fra de seneste 15 minutter
         private readonly TimeSpan _lookbackWindow = TimeSpan.FromMinutes(15);
@@ -78,15 +78,24 @@ namespace SecurityMonitorService.Services
 
             var result = await _analysisService.AnalyzeLogsAsync(logs);
 
-            _logger.LogInformation("[SecurityMonitor] Sværhedsgrad={level}, Angrebstype={type}",
-                result.SeverityLevel, result.AttackType);
+            _logger.LogInformation("[SecurityMonitor] ─────────────────────────────────");
+            _logger.LogInformation("[SecurityMonitor] Sværhedsgrad : {level}/4", result.SeverityLevel);
+            _logger.LogInformation("[SecurityMonitor] Angrebstype  : {type}", result.AttackType);
+            _logger.LogInformation("[SecurityMonitor] Opsummering  : {summary}", result.Summary);
+            _logger.LogInformation("[SecurityMonitor] Anbefaling   : {rec}", result.Recommendation);
+            _logger.LogInformation("[SecurityMonitor] ─────────────────────────────────");
 
             var alertCooldownExpired = DateTime.UtcNow - _lastAlertSent > _alertCooldown;
 
             if (result.SeverityLevel >= 2 && alertCooldownExpired)
             {
+                _logger.LogWarning("[SecurityMonitor] Angreb detekteret! Sender email alarm...");
                 await _analysisService.SendAlertEmailAsync(result);
                 _lastAlertSent = DateTime.UtcNow;
+            }
+            else if (result.SeverityLevel == 0)
+            {
+                _logger.LogInformation("[SecurityMonitor] Alt normalt, ingen alarm.");
             }
         }
     }
