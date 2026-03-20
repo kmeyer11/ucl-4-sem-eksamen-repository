@@ -53,9 +53,18 @@ namespace SecurityMonitorService.Services
             var response = await _http.SendAsync(request);
             var responseJson = await response.Content.ReadAsStringAsync();
 
+            _logger.LogInformation("[SecurityMonitor] Ollama råsvar: {response}", responseJson);
+
             using var doc = JsonDocument.Parse(responseJson);
-            var content = doc.RootElement
-                .GetProperty("choices")[0]
+            var root = doc.RootElement;
+
+            if (!root.TryGetProperty("choices", out var choices))
+            {
+                _logger.LogError("[SecurityMonitor] Uventet svar fra Ollama — mangler 'choices'. Råsvar: {response}", responseJson);
+                return new SecurityAnalysisResult { AttackType = "Ukendt", Summary = "Kunne ikke parse Ollama svar" };
+            }
+
+            var content = choices[0]
                 .GetProperty("message")
                 .GetProperty("content")
                 .GetString() ?? "{}";

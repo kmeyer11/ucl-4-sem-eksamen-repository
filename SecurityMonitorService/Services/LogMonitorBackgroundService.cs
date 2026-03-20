@@ -11,12 +11,10 @@ namespace SecurityMonitorService.Services
         private readonly ILogger<LogMonitorBackgroundService> _logger;
 
         private DateTime _lastAlertSent = DateTime.MinValue;
+        private DateTime _lastChecked = DateTime.UtcNow;
 
-        // Kør analyse hvert 5. minut
+        // Kør analyse hvert minut
         private readonly TimeSpan _interval = TimeSpan.FromMinutes(1);
-
-        // Kig kun på logs fra de seneste 15 minutter
-        private readonly TimeSpan _lookbackWindow = TimeSpan.FromMinutes(15);
 
         // Minimum 1 time mellem alarmer så vi ikke spam-mailer
         private readonly TimeSpan _alertCooldown = TimeSpan.FromHours(1);
@@ -53,7 +51,8 @@ namespace SecurityMonitorService.Services
         private async Task RunAnalysisCycleAsync()
         {
             var connString = _config.GetConnectionString("Default");
-            var since = DateTime.UtcNow - _lookbackWindow;
+            var since = _lastChecked;
+            _lastChecked = DateTime.UtcNow;
 
             List<LogEntry> logs;
 
