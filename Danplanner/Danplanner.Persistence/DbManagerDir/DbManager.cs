@@ -14,6 +14,7 @@ namespace Danplanner.Persistence.DbMangagerDir
         public DbSet<User> User => Set<User>();
         public DbSet<Orderline> Orderline => Set<Orderline>();
         public DbSet<Season> Season => Set<Season>();
+        public DbSet<Log> Log => Set<Log>();
     }
 
 }
