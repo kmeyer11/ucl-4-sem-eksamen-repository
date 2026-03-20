@@ -10,6 +10,10 @@ namespace Danplanner.Domain.Entities
         public string LogDescription { get; set; }
         [Required]
         public DateTime LogTimeStamp { get; set; }
-        public int AdminId { get; set; }
+        public int? AdminId { get; set; }
+        [Required]
+        public string LogType { get; set; }
+        public string? AffectedEmail { get; set; }
+        public string? IpAddress { get; set; }
     }
 }
