@@ -11,6 +11,8 @@ using Danplanner.Application.Interfaces.AuthInterfaces.IUserLogin;
 using Danplanner.Application.Interfaces.AuthInterfaces;
 using Danplanner.Application.Interfaces.BruteForceDetectionInterfaces;
 using Danplanner.Application.Interfaces.UserInterfaces;
+using Danplanner.Application.Interfaces.LogInterfaces;
+using Danplanner.Application.Models;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace Danplanner.Client.Controllers
@@ -30,6 +32,7 @@ namespace Danplanner.Client.Controllers
         private readonly IBruteForceDetection _bruteForce;
         private readonly IUserGetByEmail _userGetByEmail;
         private readonly IUserUpdate _userUpdate;
+        private readonly ISecurityLogger _securityLogger;
 
         public AuthController(
             IAdminGetById adminIdService,
@@ -42,7 +45,8 @@ namespace Danplanner.Client.Controllers
             IUserVerifyRegisterCode userVerifyRegisterCode,
             IBruteForceDetection bruteForce,
             IUserGetByEmail userGetByEmail,
-            IUserUpdate userUpdate
+            IUserUpdate userUpdate,
+            ISecurityLogger securityLogger
             )
         {
             _adminGetById = adminIdService;
@@ -56,6 +60,7 @@ namespace Danplanner.Client.Controllers
             _bruteForce = bruteForce;
             _userGetByEmail = userGetByEmail;
             _userUpdate = userUpdate;
+            _securityLogger = securityLogger;
         }
 
         [HttpPost("register")]
@@ -93,13 +98,22 @@ namespace Danplanner.Client.Controllers
                     return StatusCode(403, "Din konto er låst. Kontakt venligst support.");
             }
 
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
             var token = await _loginService.LoginAsync(request);
 
             if (token == null)
+            {
+                await _securityLogger.LogAsync(SecurityLogTypes.FailedLogin, "Fejlet admin login forsøg", request.Email, ip);
                 return BadRequest("Invalid credentials or code.");
+            }
 
             if (token == "OTP_SENT")
+            {
+                await _securityLogger.LogAsync(SecurityLogTypes.OtpRequested, "OTP sendt til bruger", request.Email, ip);
                 return Ok("OTP sent to your email.");
+            }
+
+            await _securityLogger.LogAsync(SecurityLogTypes.SuccessLogin, "Vellykket login", request.Email, ip);
 
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);
@@ -129,25 +143,35 @@ namespace Danplanner.Client.Controllers
         [HttpPost("user/verify-code")]
         public async Task<ActionResult<string>> VerifyUserCode([FromBody] VerifyCodeDto request)
         {
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
             if (_bruteForce.IsLockedOut(request.UserEmail))
+            {
+                await _securityLogger.LogAsync(SecurityLogTypes.RateLimitHit, "Bruger ramt rate limit", request.UserEmail, ip);
                 return StatusCode(429, "Too many failed attempts. Try again later.");
+            }
 
             var token = await _userVerifyLoginCode.VerifyUserLoginCodeAsync(request.UserEmail, request.Code);
             if (token == null)
             {
                 _bruteForce.RecordFailedAttempt(request.UserEmail);
+                await _securityLogger.LogAsync(SecurityLogTypes.FailedLogin, "Forkert OTP kode", request.UserEmail, ip);
 
                 if (_bruteForce.IsLockedOut(request.UserEmail))
                 {
                     var user = await _userGetByEmail.GetUserByEmailAsync(request.UserEmail);
                     if (user != null)
+                    {
                         await _userUpdate.LockUser(user);
+                        await _securityLogger.LogAsync(SecurityLogTypes.AccountLocked, "Konto låst efter for mange fejlede forsøg", request.UserEmail, ip);
+                    }
                 }
 
                 return BadRequest("Invalid code.");
             }
 
             _bruteForce.RecordSuccessfulLogin(request.UserEmail);
+            await _securityLogger.LogAsync(SecurityLogTypes.SuccessLogin, "Vellykket bruger login via OTP", request.UserEmail, ip);
 
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);

@@ -24,6 +24,7 @@ using Danplanner.Persistence.Repositories.SeasonRepositories;
 using Danplanner.Application.Interfaces.SeasonInterfaces;
 using Danplanner.Application.Interfaces.ReservationInterfaces;
 using Danplanner.Application.Interfaces.BruteForceDetectionInterfaces;
+using Danplanner.Application.Interfaces.LogInterfaces;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
@@ -105,6 +106,7 @@ builder.Services.AddScoped<ISeasonGetAll, SeasonRepositoryGet>();
 // Security builders
 builder.Services.AddSingleton<Danplanner.Application.Services.InMemoryBruteForceCache>();
 builder.Services.AddScoped<IBruteForceDetection, BruteForceService>();
+builder.Services.AddScoped<ISecurityLogger, SecurityLogService>();
 
 // Rate limiter
 builder.Services.AddRateLimiter(options =>
