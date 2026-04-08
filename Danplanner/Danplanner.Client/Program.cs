@@ -123,7 +123,11 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services
-    .AddAuthentication()
+    .AddAuthentication("Cookies")
+    .AddCookie("Cookies", options =>
+    {
+        options.LoginPath = "/Login";
+    })
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
         ApiKeyAuthenticationHandler.SchemeName, null);
 
@@ -147,15 +151,8 @@ builder.Services.AddScoped<IParseDate, ParseDateService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IReservationLockService, ReservationLockService>();
 
-// HttpClient 
+// HttpClient
 builder.Services.AddHttpClient();
-
-// Cookies
-builder.Services.AddAuthentication("Cookies")
-    .AddCookie("Cookies", options =>
-    {
-        options.LoginPath = "/Login";
-    });
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
@@ -173,9 +170,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseRateLimiter();
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
