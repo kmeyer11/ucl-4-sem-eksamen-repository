@@ -33,14 +33,19 @@ namespace Danplanner.Infrastructure.Services
             {
                 return Task.FromResult(AuthenticateResult.Fail("Invalid API key"));
             }
-            
+
             var identity = new ClaimsIdentity(
                 [new Claim(ClaimTypes.Name, SchemeName)], SchemeName
             );
 
             return Task.FromResult(AuthenticateResult.Success(
                 new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName)));
+        }
 
+        protected override Task HandleChallengeAsync(AuthenticationProperties properties)
+        {
+            Response.StatusCode = 401;
+            return Task.CompletedTask;
         }
     }
 }
