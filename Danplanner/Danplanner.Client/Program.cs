@@ -27,6 +27,7 @@ using Danplanner.Application.Interfaces.BruteForceDetectionInterfaces;
 using Danplanner.Application.Interfaces.LogInterfaces;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,6 +109,24 @@ builder.Services.AddSingleton<Danplanner.Application.Services.InMemoryBruteForce
 builder.Services.AddScoped<IBruteForceDetection, BruteForceService>();
 builder.Services.AddScoped<ISecurityLogger, SecurityLogRepository>();
 
+// Api Endpoint stuff
+builder.Services.AddOptions<ApiOptions>()
+    .BindConfiguration("Api");
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiKeyPolicy", policy =>
+    {
+        policy.AddAuthenticationSchemes(ApiKeyAuthenticationHandler.SchemeName);
+        policy.RequireAuthenticatedUser();
+    });
+});
+
+builder.Services
+    .AddAuthentication()
+    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
+        ApiKeyAuthenticationHandler.SchemeName, null);
+
 // Rate limiter
 builder.Services.AddRateLimiter(options =>
 {
@@ -154,6 +173,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -1,5 +1,6 @@
 ﻿using Danplanner.Application.Interfaces.UserInterfaces;
 using Danplanner.Application.Models.ModelsDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Danplanner.Client.Controllers
@@ -21,6 +22,7 @@ namespace Danplanner.Client.Controllers
             _userDelete = userDelete;
         }
 
+        [Authorize(Policy = "ApiKeyPolicy")]
         [HttpGet]
         public async Task<ActionResult<List<UserDto>>> GetUsers()
         {
