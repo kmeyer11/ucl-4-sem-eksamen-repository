@@ -29,7 +29,7 @@ namespace Danplanner.Infrastructure.Services
             {
                 return Task.FromResult(AuthenticateResult.Fail("Api key is missing"));
             }
-            if (apiKeyHeader != "hemmelig-nøgle")
+            if (apiKeyHeader != "1234")
             {
                 return Task.FromResult(AuthenticateResult.Fail("Invalid API key"));
             }
